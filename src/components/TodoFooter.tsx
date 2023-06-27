@@ -1,17 +1,10 @@
-import { useContext } from "react";
+import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import styled from "styled-components";
 import { DarkContext } from "../contexts/DarkContext";
+import { Todo } from "../models/Todos";
 
 export default function TodoFooter() {
-  const { isDark } = useContext(DarkContext);
-  return (
-    <Footer isDark={isDark}>
-      <Form>
-        <Input type='text' placeholder='Add Todo..' />
-        <Button type='submit'>Add</Button>
-      </Form>
-    </Footer>
-  );
+  return <></>;
 }
 
 const Footer = styled.footer<{ isDark: boolean }>`

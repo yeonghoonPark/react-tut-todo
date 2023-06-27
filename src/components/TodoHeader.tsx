@@ -4,45 +4,8 @@ import { DarkContext } from "../contexts/DarkContext";
 import MoonIcon from "./icons/MoonIcon";
 import SunIcon from "./icons/SunIcon";
 
-type Props = {
-  navValue: string;
-  setNavValue: Dispatch<SetStateAction<string>>;
-};
-
-const navs = ["all", "active", "completed"];
-
-export default function TodoHeader({ navValue, setNavValue }: Props) {
-  const { isDark, toggleDark } = useContext(DarkContext);
-
-  const handleClick = (e: React.MouseEvent<HTMLLIElement>) => {
-    const value = e.currentTarget.dataset.value;
-    setNavValue(value as string);
-  };
-
-  return (
-    <Header isDark={isDark}>
-      {isDark ? (
-        <SunIcon onClick={toggleDark} />
-      ) : (
-        <MoonIcon onClick={toggleDark} />
-      )}
-
-      <nav>
-        <Ul>
-          {navs.map((cV, i) => (
-            <Li
-              active={navValue === cV}
-              key={i}
-              data-value={cV}
-              onClick={handleClick}
-            >
-              {cV}
-            </Li>
-          ))}
-        </Ul>
-      </nav>
-    </Header>
-  );
+export default function TodoHeader() {
+  return <></>;
 }
 
 const Header = styled.header<{ isDark: boolean }>`
