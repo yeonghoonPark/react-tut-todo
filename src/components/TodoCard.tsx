@@ -1,11 +1,4 @@
-import {
-  useEffect,
-  useState,
-  useContext,
-  useCallback,
-  ChangeEvent,
-  FormEvent,
-} from "react";
+import { useEffect, useState, useContext, ChangeEvent, FormEvent } from "react";
 import styled from "styled-components";
 import { DarkContext } from "../contexts/DarkContext";
 import { Todo } from "../models/Todos";
@@ -30,14 +23,69 @@ export default function TodoCard() {
   };
 
   const handleNavBtns = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // console.log(e.currentTarget.dataset.value);
     const value = e.currentTarget.dataset.value;
+
     setNavVal(value as string);
+
+    const todos: Todo[] = JSON.parse(localStorage.getItem("todos") || "[]");
+
+    switch (value) {
+      case "all":
+        setTodos(todos);
+        break;
+      case "active":
+        setTodos(todos.filter((cV) => !cV.isChecked));
+        break;
+      case "completed":
+        setTodos(todos.filter((cV) => cV.isChecked));
+        break;
+
+      default:
+        break;
+    }
   };
 
-  const handleTodo = (
-    e: React.MouseEvent<HTMLLabelElement | HTMLInputElement>,
-  ) => {};
+  const handleTodoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id = e.currentTarget.name;
+    const localTodos: Todo[] = JSON.parse(
+      localStorage.getItem("todos") || "[]",
+    );
+
+    setTodos(
+      todos.map((cV) => {
+        if (cV.id === id) {
+          cV.isChecked = !cV.isChecked;
+        }
+        return cV;
+      }),
+    );
+
+    localStorage.setItem(
+      "todos",
+      JSON.stringify(
+        localTodos.map((cV) => {
+          if (cV.id === id) {
+            cV.isChecked = !cV.isChecked;
+          }
+          return cV;
+        }),
+      ),
+    );
+  };
+
+  const handleTrashBtns = (e: React.MouseEvent<HTMLDivElement>) => {
+    const id = e.currentTarget.dataset.id;
+    const localTodos: Todo[] = JSON.parse(
+      localStorage.getItem("todos") || "[]",
+    );
+
+    setTodos(todos.filter((cV) => cV.id !== id));
+
+    localStorage.setItem(
+      "todos",
+      JSON.stringify(localTodos.filter((cV) => cV.id !== id)),
+    );
+  };
 
   useEffect(() => {
     console.log(localStorage.getItem("todos"));
@@ -71,8 +119,8 @@ export default function TodoCard() {
 
         <nav>
           <Ul>
-            {navList.map((cV, i) => (
-              <NavLi key={i}>
+            {navList.map((cV) => (
+              <NavLi key={cV} active={cV === navVal}>
                 <NavButton data-value={cV} onClick={handleNavBtns}>
                   {cV}
                 </NavButton>
@@ -87,22 +135,20 @@ export default function TodoCard() {
       <Main isDark={isDark}>
         <ul>
           {todos.length > 0 &&
-            todos.map((cV, i) => (
-              <Li key={i}>
-                <Label htmlFor={`${cV.todo}${i}`}>
+            todos.map(({ id, isChecked, todo }) => (
+              <Li key={id}>
+                <Label htmlFor={id}>
                   <Input
                     type='checkbox'
-                    id={`${cV.todo}${i}`}
-                    name={cV.todo}
-                    onClick={handleTodo}
+                    id={id}
+                    name={id}
+                    checked={isChecked}
+                    onChange={handleTodoChange}
                   />
-                  <H2 isChecked={cV.isChecked}>{cV.todo}</H2>
+                  <H2 isChecked={isChecked}>{todo}</H2>
                 </Label>
 
-                <TrashBox
-                  // onClick={deleteTodo}
-                  data-todo={cV.todo}
-                >
+                <TrashBox onClick={handleTrashBtns} data-id={id}>
                   <TrashIcon />
                 </TrashBox>
               </Li>
@@ -157,7 +203,7 @@ const Ul = styled.ul`
   gap: 1.5rem;
 `;
 
-const NavLi = styled.li<{ active?: boolean }>`
+const NavLi = styled.li<{ active: boolean }>`
   list-style: none;
   cursor: pointer;
   font-weight: bolder;
