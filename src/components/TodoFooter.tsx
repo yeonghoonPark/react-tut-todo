@@ -1,12 +1,60 @@
-import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import styled from "styled-components";
-import { DarkContext } from "../contexts/DarkContext";
 import { Todo } from "../models/Todos";
 
-export default function TodoFooter() {
-  return <></>;
+type Props = {
+  isDark: boolean;
+  todoInputVal: string;
+  setTodoInputVal: React.Dispatch<React.SetStateAction<string>>;
+  getTodosData: () => void;
+  todos: Todo[];
+};
+
+const generateRandomString = (): string => {
+  return Math.random().toString(36).split(".")[1];
+};
+
+export default function TodoFooter({
+  isDark,
+  todoInputVal,
+  setTodoInputVal,
+  getTodosData,
+  todos,
+}: Props) {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTodoInputVal(e.target.value);
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const todo = [
+      { id: generateRandomString(), isChecked: false, todo: todoInputVal },
+    ];
+    localStorage.setItem("todos", JSON.stringify([...todos, ...todo]));
+    setTodoInputVal("");
+    getTodosData();
+  };
+
+  return (
+    <>
+      {/* Footer시작 */}
+      <Footer isDark={isDark}>
+        <Form onSubmit={handleSubmit}>
+          <FormInput
+            type='text'
+            placeholder='Add Todo..'
+            required
+            value={todoInputVal}
+            onChange={handleInputChange}
+          />
+          <Button type='submit'>Add</Button>
+        </Form>
+      </Footer>
+      {/* Footer끝 */}
+    </>
+  );
 }
 
+// Footer시작
 const Footer = styled.footer<{ isDark: boolean }>`
   background-color: ${(props) => (props.isDark ? "#2a3042" : "#ebf2f5")};
   padding: 1rem;
@@ -19,7 +67,7 @@ const Form = styled.form`
   gap: 1rem;
 `;
 
-const Input = styled.input`
+const FormInput = styled.input`
   width: 100%;
   border: 1px solid #c7c7c7;
   border-radius: 5px;
@@ -39,3 +87,4 @@ const Button = styled.button`
     background-color: orangered;
   }
 `;
+// Footer끝

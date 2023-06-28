@@ -1,13 +1,72 @@
-import { Dispatch, SetStateAction, useContext } from "react";
 import styled from "styled-components";
-import { DarkContext } from "../contexts/DarkContext";
+import { Todo } from "../models/Todos";
 import MoonIcon from "./icons/MoonIcon";
 import SunIcon from "./icons/SunIcon";
 
-export default function TodoHeader() {
-  return <></>;
+const navList = ["all", "active", "completed"];
+
+type Props = {
+  isDark: boolean;
+  toggleDark: () => void;
+  navVal: string;
+  setNavVal: React.Dispatch<React.SetStateAction<string>>;
+  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+};
+
+export default function TodoHeader({
+  isDark,
+  toggleDark,
+  navVal,
+  setNavVal,
+  setTodos,
+}: Props) {
+  const handleNavBtns = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const value = e.currentTarget.dataset.value;
+    setNavVal(value as string);
+    const todos: Todo[] = JSON.parse(localStorage.getItem("todos") || "[]");
+    switch (value) {
+      case "all":
+        setTodos(todos);
+        break;
+      case "active":
+        setTodos(todos.filter((cV) => !cV.isChecked));
+        break;
+      case "completed":
+        setTodos(todos.filter((cV) => cV.isChecked));
+        break;
+      default:
+        break;
+    }
+  };
+
+  return (
+    <>
+      {/* Header시작 */}
+      <Header isDark={isDark}>
+        {isDark ? (
+          <SunIcon onClick={toggleDark} />
+        ) : (
+          <MoonIcon onClick={toggleDark} />
+        )}
+
+        <nav>
+          <Ul>
+            {navList.map((cV) => (
+              <NavLi key={cV} active={cV === navVal}>
+                <NavButton data-value={cV} onClick={handleNavBtns}>
+                  {cV}
+                </NavButton>
+              </NavLi>
+            ))}
+          </Ul>
+        </nav>
+      </Header>
+      {/* Header끝 */}
+    </>
+  );
 }
 
+// Header시작
 const Header = styled.header<{ isDark: boolean }>`
   background-color: ${(props) => (props.isDark ? "#2a3042" : "#ebf2f5")};
   padding: 1rem;
@@ -21,7 +80,7 @@ const Ul = styled.ul`
   gap: 1.5rem;
 `;
 
-const Li = styled.li<{ active: boolean }>`
+const NavLi = styled.li<{ active: boolean }>`
   list-style: none;
   cursor: pointer;
   font-weight: bolder;
@@ -32,3 +91,8 @@ const Li = styled.li<{ active: boolean }>`
     color: orangered;
   }
 `;
+
+const NavButton = styled.button`
+  all: unset;
+`;
+// Header끝

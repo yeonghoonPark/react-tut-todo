@@ -1,16 +1,10 @@
-import { useEffect, useState, useContext, ChangeEvent, FormEvent } from "react";
+import { useEffect, useState, useContext } from "react";
 import styled from "styled-components";
 import { DarkContext } from "../contexts/DarkContext";
 import { Todo } from "../models/Todos";
-import MoonIcon from "./icons/MoonIcon";
-import SunIcon from "./icons/SunIcon";
-import TrashIcon from "./icons/TrashIcon";
-
-const navList = ["all", "active", "completed"];
-
-const generateRandomString = (): string => {
-  return Math.random().toString(36).split(".")[1];
-};
+import TodoFooter from "./TodoFooter";
+import TodoHeader from "./TodoHeader";
+import TodoMain from "./TodoMain";
 
 export default function TodoCard() {
   const { isDark, toggleDark } = useContext(DarkContext);
@@ -18,73 +12,9 @@ export default function TodoCard() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [todoInputVal, setTodoInputVal] = useState("");
 
-  const getTodosData = () => {
-    setTodos(JSON.parse(localStorage.getItem("todos") || "[]"));
-  };
-
-  const handleNavBtns = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const value = e.currentTarget.dataset.value;
-
-    setNavVal(value as string);
-
+  const getTodosData = async () => {
     const todos: Todo[] = JSON.parse(localStorage.getItem("todos") || "[]");
-
-    switch (value) {
-      case "all":
-        setTodos(todos);
-        break;
-      case "active":
-        setTodos(todos.filter((cV) => !cV.isChecked));
-        break;
-      case "completed":
-        setTodos(todos.filter((cV) => cV.isChecked));
-        break;
-
-      default:
-        break;
-    }
-  };
-
-  const handleTodoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const id = e.currentTarget.name;
-    const localTodos: Todo[] = JSON.parse(
-      localStorage.getItem("todos") || "[]",
-    );
-
-    setTodos(
-      todos.map((cV) => {
-        if (cV.id === id) {
-          cV.isChecked = !cV.isChecked;
-        }
-        return cV;
-      }),
-    );
-
-    localStorage.setItem(
-      "todos",
-      JSON.stringify(
-        localTodos.map((cV) => {
-          if (cV.id === id) {
-            cV.isChecked = !cV.isChecked;
-          }
-          return cV;
-        }),
-      ),
-    );
-  };
-
-  const handleTrashBtns = (e: React.MouseEvent<HTMLDivElement>) => {
-    const id = e.currentTarget.dataset.id;
-    const localTodos: Todo[] = JSON.parse(
-      localStorage.getItem("todos") || "[]",
-    );
-
-    setTodos(todos.filter((cV) => cV.id !== id));
-
-    localStorage.setItem(
-      "todos",
-      JSON.stringify(localTodos.filter((cV) => cV.id !== id)),
-    );
+    setTodos(todos);
   };
 
   useEffect(() => {
@@ -93,84 +23,24 @@ export default function TodoCard() {
     getTodosData();
   }, []);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setTodoInputVal(e.target.value);
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const todo = [
-      { id: generateRandomString(), isChecked: false, todo: todoInputVal },
-    ];
-    localStorage.setItem("todos", JSON.stringify([...todos, ...todo]));
-    setTodoInputVal("");
-    getTodosData();
-  };
-
   return (
     <Container>
-      {/* Header시작 */}
-      <Header isDark={isDark}>
-        {isDark ? (
-          <SunIcon onClick={toggleDark} />
-        ) : (
-          <MoonIcon onClick={toggleDark} />
-        )}
+      <TodoHeader
+        isDark={isDark}
+        toggleDark={toggleDark}
+        navVal={navVal}
+        setNavVal={setNavVal}
+        setTodos={setTodos}
+      />
 
-        <nav>
-          <Ul>
-            {navList.map((cV) => (
-              <NavLi key={cV} active={cV === navVal}>
-                <NavButton data-value={cV} onClick={handleNavBtns}>
-                  {cV}
-                </NavButton>
-              </NavLi>
-            ))}
-          </Ul>
-        </nav>
-      </Header>
-      {/* Header끝 */}
-
-      {/* Main시작 */}
-      <Main isDark={isDark}>
-        <ul>
-          {todos.length > 0 &&
-            todos.map(({ id, isChecked, todo }) => (
-              <Li key={id}>
-                <Label htmlFor={id}>
-                  <Input
-                    type='checkbox'
-                    id={id}
-                    name={id}
-                    checked={isChecked}
-                    onChange={handleTodoChange}
-                  />
-                  <H2 isChecked={isChecked}>{todo}</H2>
-                </Label>
-
-                <TrashBox onClick={handleTrashBtns} data-id={id}>
-                  <TrashIcon />
-                </TrashBox>
-              </Li>
-            ))}
-        </ul>
-      </Main>
-      {/* Main끝 */}
-
-      {/* Footer시작 */}
-      <Footer isDark={isDark}>
-        <Form onSubmit={handleSubmit}>
-          <FormInput
-            type='text'
-            placeholder='Add Todo..'
-            required
-            value={todoInputVal}
-            onChange={handleInputChange}
-          />
-          <Button type='submit'>Add</Button>
-        </Form>
-      </Footer>
-      {/* Footer끝 */}
+      <TodoMain isDark={isDark} todos={todos} setTodos={setTodos} />
+      <TodoFooter
+        isDark={isDark}
+        todoInputVal={todoInputVal}
+        setTodoInputVal={setTodoInputVal}
+        getTodosData={getTodosData}
+        todos={todos}
+      />
     </Container>
   );
 }
@@ -188,106 +58,3 @@ const Container = styled.div`
   box-shadow: 2px 2px 4px 4px #b3b0b0;
   overflow: hidden;
 `;
-
-// Header시작
-const Header = styled.header<{ isDark: boolean }>`
-  background-color: ${(props) => (props.isDark ? "#2a3042" : "#ebf2f5")};
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const Ul = styled.ul`
-  display: flex;
-  gap: 1.5rem;
-`;
-
-const NavLi = styled.li<{ active: boolean }>`
-  list-style: none;
-  cursor: pointer;
-  font-weight: bolder;
-  border-bottom: ${(props) => (props.active ? "2px solid #c9c7c7" : "")};
-  color: ${(props) => (props.active ? "orangered" : " #f37e54")};
-  text-transform: capitalize;
-  :hover {
-    color: orangered;
-  }
-`;
-
-const NavButton = styled.button`
-  all: unset;
-`;
-// Header끝
-
-// Main시작
-const Main = styled.main<{ isDark: boolean }>`
-  background-color: ${(props) => (props.isDark ? "black" : "white")};
-  color: ${(props) => (props.isDark ? "white" : "black")};
-  height: 100%;
-  padding: 1rem;
-`;
-
-const Li = styled.li`
-  list-style: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const Label = styled.label`
-  display: flex;
-  gap: 0.5rem;
-  cursor: pointer;
-`;
-
-const Input = styled.input`
-  width: 16px;
-  cursor: pointer;
-`;
-
-const H2 = styled.h2<{ isChecked: boolean }>`
-  font-size: 1rem;
-  font-weight: bolder;
-  text-decoration: ${(props) => (props.isChecked ? "line-through" : "none")};
-  color: ${(props) => props.isChecked && "gray"};
-  transition: 0.3s;
-`;
-
-const TrashBox = styled.div``;
-// Main끝
-
-// Footer시작
-const Footer = styled.footer<{ isDark: boolean }>`
-  background-color: ${(props) => (props.isDark ? "#2a3042" : "#ebf2f5")};
-  padding: 1rem;
-`;
-
-const Form = styled.form`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const FormInput = styled.input`
-  width: 100%;
-  border: 1px solid #c7c7c7;
-  border-radius: 5px;
-  outline: none;
-  padding: 0.5rem;
-`;
-
-const Button = styled.button`
-  background-color: #f37e54;
-  color: white;
-  padding: 0.5rem;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  :hover {
-    background-color: orangered;
-  }
-`;
-// Footer끝

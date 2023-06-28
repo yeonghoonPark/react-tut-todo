@@ -1,9 +1,88 @@
 import styled from "styled-components";
+import { Todo } from "../models/Todos";
+import TrashIcon from "./icons/TrashIcon";
 
-export default function TodoMain() {
-  return <></>;
+type Props = {
+  isDark: boolean;
+  todos: Todo[];
+  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+};
+
+export default function TodoMain({ isDark, todos, setTodos }: Props) {
+  const handleTodoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id = e.currentTarget.name;
+    const localTodos: Todo[] = JSON.parse(
+      localStorage.getItem("todos") || "[]",
+    );
+
+    setTodos(
+      todos.map((cV) => {
+        if (cV.id === id) {
+          cV.isChecked = !cV.isChecked;
+        }
+        return cV;
+      }),
+    );
+
+    localStorage.setItem(
+      "todos",
+      JSON.stringify(
+        localTodos.map((cV) => {
+          if (cV.id === id) {
+            cV.isChecked = !cV.isChecked;
+          }
+          return cV;
+        }),
+      ),
+    );
+  };
+
+  const handleTrashBtns = (e: React.MouseEvent<HTMLDivElement>) => {
+    const id = e.currentTarget.dataset.id;
+    const localTodos: Todo[] = JSON.parse(
+      localStorage.getItem("todos") || "[]",
+    );
+
+    setTodos(todos.filter((cV) => cV.id !== id));
+
+    localStorage.setItem(
+      "todos",
+      JSON.stringify(localTodos.filter((cV) => cV.id !== id)),
+    );
+  };
+
+  return (
+    <>
+      {/* Main시작 */}
+      <Main isDark={isDark}>
+        <ul>
+          {todos.length > 0 &&
+            todos.map(({ id, isChecked, todo }) => (
+              <Li key={id}>
+                <Label htmlFor={id}>
+                  <Input
+                    type='checkbox'
+                    id={id}
+                    name={id}
+                    checked={isChecked}
+                    onChange={handleTodoChange}
+                  />
+                  <H2 isChecked={isChecked}>{todo}</H2>
+                </Label>
+
+                <TrashBox onClick={handleTrashBtns} data-id={id}>
+                  <TrashIcon />
+                </TrashBox>
+              </Li>
+            ))}
+        </ul>
+      </Main>
+      {/* Main끝 */}
+    </>
+  );
 }
 
+// Main시작
 const Main = styled.main<{ isDark: boolean }>`
   background-color: ${(props) => (props.isDark ? "black" : "white")};
   color: ${(props) => (props.isDark ? "white" : "black")};
@@ -26,9 +105,7 @@ const Label = styled.label`
 
 const Input = styled.input`
   width: 16px;
-  :checked {
-    background-color: red;
-  }
+  cursor: pointer;
 `;
 
 const H2 = styled.h2<{ isChecked: boolean }>`
@@ -40,3 +117,4 @@ const H2 = styled.h2<{ isChecked: boolean }>`
 `;
 
 const TrashBox = styled.div``;
+// Main끝
