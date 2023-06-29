@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import styled from "styled-components";
 import { Todo } from "../models/Todos";
 import TrashIcon from "./icons/TrashIcon";
@@ -9,47 +10,53 @@ type Props = {
 };
 
 export default function TodoMain({ isDark, todos, setTodos }: Props) {
-  const handleTodoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const id = e.currentTarget.name;
-    const localTodos: Todo[] = JSON.parse(
-      localStorage.getItem("todos") || "[]",
-    );
+  const handleTodoChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const id = e.currentTarget.name;
+      const localTodos: Todo[] = JSON.parse(
+        localStorage.getItem("todos") || "[]",
+      );
 
-    setTodos(
-      todos.map((cV) => {
-        if (cV.id === id) {
-          cV.isChecked = !cV.isChecked;
-        }
-        return cV;
-      }),
-    );
-
-    localStorage.setItem(
-      "todos",
-      JSON.stringify(
-        localTodos.map((cV) => {
+      setTodos(
+        todos.map((cV) => {
           if (cV.id === id) {
             cV.isChecked = !cV.isChecked;
           }
           return cV;
         }),
-      ),
-    );
-  };
+      );
 
-  const handleTrashBtns = (e: React.MouseEvent<HTMLDivElement>) => {
-    const id = e.currentTarget.dataset.id;
-    const localTodos: Todo[] = JSON.parse(
-      localStorage.getItem("todos") || "[]",
-    );
+      localStorage.setItem(
+        "todos",
+        JSON.stringify(
+          localTodos.map((cV) => {
+            if (cV.id === id) {
+              cV.isChecked = !cV.isChecked;
+            }
+            return cV;
+          }),
+        ),
+      );
+    },
+    [setTodos, todos],
+  );
 
-    setTodos(todos.filter((cV) => cV.id !== id));
+  const handleTrashBtns = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const id = e.currentTarget.dataset.id;
+      const localTodos: Todo[] = JSON.parse(
+        localStorage.getItem("todos") || "[]",
+      );
 
-    localStorage.setItem(
-      "todos",
-      JSON.stringify(localTodos.filter((cV) => cV.id !== id)),
-    );
-  };
+      setTodos(todos.filter((cV) => cV.id !== id));
+
+      localStorage.setItem(
+        "todos",
+        JSON.stringify(localTodos.filter((cV) => cV.id !== id)),
+      );
+    },
+    [setTodos, todos],
+  );
 
   return (
     <>

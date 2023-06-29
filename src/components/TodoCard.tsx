@@ -32,7 +32,6 @@ export default function TodoCard() {
         setNavVal={setNavVal}
         setTodos={setTodos}
       />
-
       <TodoMain isDark={isDark} todos={todos} setTodos={setTodos} />
       <TodoFooter
         isDark={isDark}

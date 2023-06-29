@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Todo } from "../models/Todos";
+import { useCallback } from "react";
 
 type Props = {
   isDark: boolean;
@@ -20,19 +21,25 @@ export default function TodoFooter({
   getTodosData,
   todos,
 }: Props) {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTodoInputVal(e.target.value);
-  };
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTodoInputVal(e.target.value);
+    },
+    [setTodoInputVal],
+  );
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const todo = [
-      { id: generateRandomString(), isChecked: false, todo: todoInputVal },
-    ];
-    localStorage.setItem("todos", JSON.stringify([...todos, ...todo]));
-    setTodoInputVal("");
-    getTodosData();
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const todo = [
+        { id: generateRandomString(), isChecked: false, todo: todoInputVal },
+      ];
+      localStorage.setItem("todos", JSON.stringify([...todos, ...todo]));
+      setTodoInputVal("");
+      getTodosData();
+    },
+    [getTodosData, setTodoInputVal, todoInputVal, todos],
+  );
 
   return (
     <>

@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { Todo } from "../models/Todos";
 import MoonIcon from "./icons/MoonIcon";
 import SunIcon from "./icons/SunIcon";
+import { useCallback } from "react";
 
 const navList = ["all", "active", "completed"];
 
@@ -20,24 +21,27 @@ export default function TodoHeader({
   setNavVal,
   setTodos,
 }: Props) {
-  const handleNavBtns = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const value = e.currentTarget.dataset.value;
-    setNavVal(value as string);
-    const todos: Todo[] = JSON.parse(localStorage.getItem("todos") || "[]");
-    switch (value) {
-      case "all":
-        setTodos(todos);
-        break;
-      case "active":
-        setTodos(todos.filter((cV) => !cV.isChecked));
-        break;
-      case "completed":
-        setTodos(todos.filter((cV) => cV.isChecked));
-        break;
-      default:
-        break;
-    }
-  };
+  const handleNavBtns = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      const value = e.currentTarget.dataset.value;
+      setNavVal(value as string);
+      const todos: Todo[] = JSON.parse(localStorage.getItem("todos") || "[]");
+      switch (value) {
+        case "all":
+          setTodos(todos);
+          break;
+        case "active":
+          setTodos(todos.filter((cV) => !cV.isChecked));
+          break;
+        case "completed":
+          setTodos(todos.filter((cV) => cV.isChecked));
+          break;
+        default:
+          break;
+      }
+    },
+    [setNavVal, setTodos],
+  );
 
   return (
     <>
