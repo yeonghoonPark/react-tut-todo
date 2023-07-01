@@ -1,3 +1,16 @@
+:root {
+  --color-side-bg: #ebf2f5;
+  --color-bg: white;
+  --color-text: black;
+  --color-accent: orangered;
+}
+
+html.dark {
+  --color-side-bg: #2a3042;
+  --color-bg: black;
+  --color-text-: white;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",

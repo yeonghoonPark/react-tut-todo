@@ -1,13 +1,13 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { DarkContext } from "../contexts/DarkContext";
+import { useDark } from "../contexts/DarkContext";
 import { Todo } from "../models/Todos";
 import TodoFooter from "./TodoFooter";
-import TodoHeader from "./TodoHeader";
+
 import TodoMain from "./TodoMain";
 
 export default function TodoCard() {
-  const { isDark, toggleDark } = useContext(DarkContext);
+  const { isDark, toggleDark } = useDark();
   const [navVal, setNavVal] = useState("");
   const [todos, setTodos] = useState<Todo[]>([]);
   const [todoInputVal, setTodoInputVal] = useState("");
@@ -25,13 +25,6 @@ export default function TodoCard() {
 
   return (
     <Container>
-      <TodoHeader
-        isDark={isDark}
-        toggleDark={toggleDark}
-        navVal={navVal}
-        setNavVal={setNavVal}
-        setTodos={setTodos}
-      />
       <TodoMain isDark={isDark} todos={todos} setTodos={setTodos} />
       <TodoFooter
         isDark={isDark}

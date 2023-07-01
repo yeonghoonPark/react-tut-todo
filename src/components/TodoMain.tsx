@@ -62,27 +62,29 @@ export default function TodoMain({ isDark, todos, setTodos }: Props) {
     <>
       {/* Main시작 */}
       <Main isDark={isDark}>
-        <ul>
-          {todos.length > 0 &&
-            todos.map(({ id, isChecked, todo }) => (
-              <Li key={id}>
-                <Label htmlFor={id}>
-                  <Input
-                    type='checkbox'
-                    id={id}
-                    name={id}
-                    checked={isChecked}
-                    onChange={handleTodoChange}
-                  />
-                  <H2 isChecked={isChecked}>{todo}</H2>
-                </Label>
+        <section>
+          <Ul>
+            {todos.length > 0 &&
+              todos.map(({ id, isChecked, todo }) => (
+                <Li key={id}>
+                  <Label htmlFor={id}>
+                    <Input
+                      type='checkbox'
+                      id={id}
+                      name={id}
+                      checked={isChecked}
+                      onChange={handleTodoChange}
+                    />
+                    <H2 isChecked={isChecked}>{todo}</H2>
+                  </Label>
 
-                <TrashBox onClick={handleTrashBtns} data-id={id}>
-                  <TrashIcon />
-                </TrashBox>
-              </Li>
-            ))}
-        </ul>
+                  <TrashBox onClick={handleTrashBtns} data-id={id}>
+                    <TrashIcon />
+                  </TrashBox>
+                </Li>
+              ))}
+          </Ul>
+        </section>
       </Main>
       {/* Main끝 */}
     </>
@@ -95,6 +97,10 @@ const Main = styled.main<{ isDark: boolean }>`
   color: ${(props) => (props.isDark ? "white" : "black")};
   height: 100%;
   padding: 1rem;
+`;
+
+const Ul = styled.ul`
+  padding-left: 0;
 `;
 
 const Li = styled.li`
