@@ -20,12 +20,10 @@ const getIsDarkFromLocalStorage = (): boolean => {
   return JSON.parse(localStorage.isDark);
 };
 
-const updateIsDark = (isDark: boolean) => {
-  if (!isDark) {
-    document.documentElement.classList.add("dark");
-  } else {
-    document.documentElement.classList.remove("dark");
-  }
+const updateIsDark = (isDark: boolean): void => {
+  !isDark
+    ? document.documentElement.classList.add("dark")
+    : document.documentElement.classList.remove("dark");
 };
 
 export const DarkProvider = ({ children }: Props) => {
@@ -48,4 +46,4 @@ export const DarkProvider = ({ children }: Props) => {
   );
 };
 
-export const useDark = () => useContext(DarkContext);
+export const useDarkContext = () => useContext(DarkContext);

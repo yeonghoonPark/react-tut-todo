@@ -1,15 +1,21 @@
 import styled from "styled-components";
-import { useDark } from "../contexts/DarkContext";
-import { Todo } from "../models/Todos";
+import { useDarkContext } from "../contexts/DarkContext";
 import MoonIcon from "./icons/MoonIcon";
 import SunIcon from "./icons/SunIcon";
 
-const navList = ["all", "active", "completed"];
+type Props = {
+  filters: string[];
+  filter: string;
+  onFilterChange: (filter: string) => void;
+};
 
-type Props = {};
+export default function TodoHeader({ filters, filter, onFilterChange }: Props) {
+  const { isDark, toggleDark } = useDarkContext();
 
-export default function TodoHeader() {
-  const { isDark, toggleDark } = useDark();
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    onFilterChange(e.currentTarget.name);
+  };
+
   return (
     <>
       {/* Header시작 */}
@@ -17,9 +23,11 @@ export default function TodoHeader() {
         <div onClick={toggleDark}>{isDark ? <SunIcon /> : <MoonIcon />}</div>
         <nav>
           <Ul>
-            {navList.map((cV) => (
-              <NavLi key={cV} active={true}>
-                <NavButton>{cV}</NavButton>
+            {filters.map((cV) => (
+              <NavLi key={cV} active={cV === filter}>
+                <NavButton name={cV} onClick={handleClick}>
+                  {cV}
+                </NavButton>
               </NavLi>
             ))}
           </Ul>
