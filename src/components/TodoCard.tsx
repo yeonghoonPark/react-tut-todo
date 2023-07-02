@@ -1,43 +1,50 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useDarkContext } from "../contexts/DarkContext";
 import { Todo } from "../models/Todos";
-import TodoFooter from "./TodoFooter";
+import TodoForm from "./TodoForm";
+import TodoList from "./TodoList";
 
-import TodoMain from "./TodoMain";
+const getLoadTodosFromLocalStorage = (): Todo[] => {
+  return JSON.parse(localStorage.getItem("todos") || "[]");
+};
 
-export default function TodoCard() {
-  const { isDark, toggleDark } = useDarkContext();
-  const [navVal, setNavVal] = useState("");
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [todoInputVal, setTodoInputVal] = useState("");
+type Props = {
+  filter: string;
+};
 
-  const getTodosData = async () => {
-    const todos: Todo[] = JSON.parse(localStorage.getItem("todos") || "[]");
-    setTodos(todos);
+export default function TodoCard({ filter }: Props) {
+  const [todos, setTodos] = useState<Todo[]>(getLoadTodosFromLocalStorage);
+
+  const handleAddTodo = (todo: Todo) => {
+    setTodos((prev) => [...prev, todo]);
+  };
+
+  const handleUpdateTodo = (todo: Todo) => {
+    setTodos(todos.map((cV) => (cV.id === todo.id ? todo : cV)));
+  };
+
+  const handleDeleteTodo = (todo: Todo) => {
+    setTodos(todos.filter((cV) => cV.id !== todo.id));
   };
 
   useEffect(() => {
-    console.log(localStorage.getItem("todos"));
-    setNavVal("all");
-    getTodosData();
-  }, []);
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
 
   return (
-    <Container>
-      <TodoMain isDark={isDark} todos={todos} setTodos={setTodos} />
-      <TodoFooter
-        isDark={isDark}
-        todoInputVal={todoInputVal}
-        setTodoInputVal={setTodoInputVal}
-        getTodosData={getTodosData}
+    <Section>
+      <TodoList
+        filter={filter}
         todos={todos}
+        onUpdateTodo={handleUpdateTodo}
+        onDeleteTodo={handleDeleteTodo}
       />
-    </Container>
+      <TodoForm onAddTodo={handleAddTodo} />
+    </Section>
   );
 }
 
-const Container = styled.div`
+const Section = styled.section`
   position: absolute;
   top: 50%;
   left: 50%;

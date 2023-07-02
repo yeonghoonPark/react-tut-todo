@@ -18,7 +18,9 @@ export default function App() {
         filter={filter}
         onFilterChange={handleFilterChange}
       />
-      <TodoCard />
+      <main>
+        <TodoCard filter={filter} />
+      </main>
     </DarkProvider>
   );
 }
